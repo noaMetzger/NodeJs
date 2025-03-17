@@ -35,14 +35,13 @@ async function InitBooks(){
     }
 
 }
-//InitBooks()
 
 async function readBooks(){
+
     try{
         const data=await fs.readFile(file,'utf-8')
         const booksArray=JSON.parse(data)
-        const books=booksArray.map(book=>new Book(book.name, book.type, book.borrowed))
-        return books
+        return booksArray
     }
     catch(error){
         console.log(error.message);
@@ -50,9 +49,12 @@ async function readBooks(){
     }
 }
 
-function print(...books) {
+async function print() {
+    const books=await readBooks()
     for (let i = 0; i < books.length; i++) {
-        console.log(books[i].toString());
+        console.log(
+            `ID: ${books[i].id}, Name: ${books[i].name}, Favorite Type: ${books[i].type}, Borrowed: ${books[i].borrowed}`
+        );
     }
 }
 async function borrow(id){

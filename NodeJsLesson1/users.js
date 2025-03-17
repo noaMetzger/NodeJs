@@ -34,8 +34,7 @@ function readUsers(){
     try{
         const data=fs.readFileSync(file,'utf-8')
         const usersArray=JSON.parse(data)
-        const users=usersArray.map(user=>new User(user.name, user.type, user.borrowed))
-        return users
+        return usersArray
     }
     catch(error){
         console.log(error.message);
@@ -47,7 +46,9 @@ function readUsers(){
 function print() {
     const users=readUsers()
     for (let i = 0; i < users.length; i++) {
-        console.log(users[i].toString());
+        console.log(
+            `ID: ${users[i].id}, Name: ${users[i].name}, Favorite Type: ${users[i].type}, Borrowed: ${users[i].borrowed}`
+        );
     }
 }
 function borrow(id){

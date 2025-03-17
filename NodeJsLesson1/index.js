@@ -1,18 +1,16 @@
 const {borrowBook,printBook,InitBooks,readBooks}=require('./books')
 const {borrowUser,printUser,InitUsers}=require('./users')
 
+const main = async () => {
 const [, ,codeUser,codeBook] = process.argv;
 
 //InitUsers()
-/*InitBooks()
-    .then(() => console.log('InitBooks started'))
-    .catch(error => console.error('Error in initBooks:', error.message))*/
-    
-    readBooks().then(()=>b=borrowBook(codeBook))
-    .then(()=>u=borrowUser(codeUser))
+/*InitBooks()*/
+   printUser()
+   await printBook()
 
-console.log(u);
-console.log(b);
+   const b=await borrowBook(Number(codeBook))
+   const u=borrowUser(Number(codeUser))
 
 if(b.type!==u.type&&b.borrowed=='no'&&u.borrowed=='no')
    {
@@ -23,9 +21,19 @@ if(b.type!==u.type&&b.borrowed=='no'&&u.borrowed=='no')
    else
       console.log("failure");
       
-      console.log(u);
-      console.log(b);
-   
 
+      console.log('trying wrong params')
+      try {
+         borrowBook(999);
+       } catch (error) {
+         console.error(error.message);
+       }
+       
+       try {
+         borrowUser(999);
+       } catch (error) {
+         console.error(error.message);
+       }
+}
 
-
+main()
