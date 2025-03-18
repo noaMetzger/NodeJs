@@ -1,4 +1,4 @@
-const {borrowBook,printBook,InitBooks,readBooks}=require('./books')
+const {borrowBook,printBook,InitBooks,readBooks,cb}=require('./books')
 const {borrowUser,printUser,InitUsers}=require('./users')
 
 const main = async () => {
@@ -7,7 +7,7 @@ const [, ,codeUser,codeBook] = process.argv;
 //InitUsers()
 /*InitBooks()*/
    printUser()
-   await printBook()
+   await printBook(cb)
 
    const b=await borrowBook(Number(codeBook))
    const u=borrowUser(Number(codeUser))

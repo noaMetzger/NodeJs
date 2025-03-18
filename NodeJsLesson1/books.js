@@ -48,15 +48,35 @@ async function readBooks(){
         return null
     }
 }
+// פונקציה לקריאת הנתונים מהקובץ עם callback
+function print(cb) {
+    fs.readFile("books.json", "utf8")
+        .then((data) => {
+            const booksData = JSON.parse(data);
+            cb(null, booksData); 
+        })
+        .catch((error) => {
+            cb(error, null); 
+        });
+}
 
-async function print() {
-    const books=await readBooks()
-    for (let i = 0; i < books.length; i++) {
-        console.log(
-            `ID: ${books[i].id}, Name: ${books[i].name}, Favorite Type: ${books[i].type}, Borrowed: ${books[i].borrowed}`
-        );
+// פונקציית callback שמטפלת בתוצאה
+function printCB(error, books) {
+    if (error) {
+        console.error("Error reading books:", error);
+    } else {
+        console.log("Books data:", books);
     }
 }
+
+// async function print() {
+//     const books=await readBooks()
+//     for (let i = 0; i < books.length; i++) {
+//         console.log(
+//             `ID: ${books[i].id}, Name: ${books[i].name}, Favorite Type: ${books[i].type}, Borrowed: ${books[i].borrowed}`
+//         );
+//     }
+// }
 async function borrow(id){
     try{
         const books=await readBooks()
@@ -72,7 +92,7 @@ async function borrow(id){
     }
 }
 
-module.exports={Book,borrowBook:borrow,printBook:print,InitBooks,readBooks}
+module.exports={Book,borrowBook:borrow,printBook:print,InitBooks,readBooks,cb:printCB}
 
 
 
