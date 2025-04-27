@@ -9,7 +9,7 @@ const [, ,codeUser,codeBook] = process.argv;
    printUser()
    await printBook(cb)
 
-   const b=await borrowBook(Number(codeBook))
+   const b=await borrowBook(Number(codeBook), Number(codeUser))
    const u=borrowUser(Number(codeUser))
 
 if(b.type!==u.type&&b.borrowed=='no'&&u.borrowed=='no')
@@ -22,18 +22,18 @@ if(b.type!==u.type&&b.borrowed=='no'&&u.borrowed=='no')
       console.log("failure");
       
 
-      console.log('trying wrong params')
-      try {
-         borrowBook(999);
-       } catch (error) {
-         console.error(error.message);
-       }
+      // console.log('trying wrong params')
+      // try {
+      //    borrowBook(999);
+      //  } catch (error) {
+      //    console.error(error.message);
+      //  }
        
-       try {
-         borrowUser(999);
-       } catch (error) {
-         console.error(error.message);
-       }
+      //  try {
+      //    borrowUser(999);
+      //  } catch (error) {
+      //    console.error(error.message);
+      //  }
 }
 
 main()

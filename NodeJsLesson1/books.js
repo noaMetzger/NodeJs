@@ -1,19 +1,21 @@
-class Book{
+const xlsx = require('xlsx');
+
+class Book {
     id;
     name;
     type;
     borrowed;
-    static count=0;
+    static count = 0;
     constructor(name, type, borrowed) {
         this.id = Book.count++;
         this.name = name;
         this.type = type;
         this.borrowed = borrowed;
-    } 
+    }
 
     toString() {
-    return `id: ${this.id}, name:${this.name}, type: ${this.type}, borrowed:${this.borrowed}`
-}
+        return `id: ${this.id}, name:${this.name}, type: ${this.type}, borrowed:${this.borrowed}`
+    }
 }
 let books2 = [
     new Book('lol', 'drama', 'no'),
@@ -24,26 +26,26 @@ let books2 = [
 const fs = require('fs').promises;
 const file = './books.json';
 
-async function InitBooks(){
-    const data=JSON.stringify(books2,null,2)
-    try{
-      await fs.writeFile(file,data)  
-      console.log('Books data has been saved to books.json')     
+async function InitBooks() {
+    const data = JSON.stringify(books2, null, 2)
+    try {
+        await fs.writeFile(file, data)
+        console.log('Books data has been saved to books.json')
     }
-    catch(err){
-        console.log('error',err.message)     
+    catch (err) {
+        console.log('error', err.message)
     }
 
 }
 
-async function readBooks(){
+async function readBooks() {
 
-    try{
-        const data=await fs.readFile(file,'utf-8')
-        const booksArray=JSON.parse(data)
+    try {
+        const data = await fs.readFile(file, 'utf-8')
+        const booksArray = JSON.parse(data)
         return booksArray
     }
-    catch(error){
+    catch (error) {
         console.log(error.message);
         return null
     }
@@ -53,10 +55,10 @@ function print(cb) {
     fs.readFile("books.json", "utf8")
         .then((data) => {
             const booksData = JSON.parse(data);
-            cb(null, booksData); 
+            cb(null, booksData);
         })
         .catch((error) => {
-            cb(error, null); 
+            cb(error, null);
         });
 }
 
@@ -77,22 +79,56 @@ function printCB(error, books) {
 //         );
 //     }
 // }
-async function borrow(id){
-    try{
-        const books=await readBooks()
-        b=books.find(x=>x.id==id)
-        if(b!=null)
-          return b
-        else 
-         throw new Error ("errorBook")    
+
+
+const writeBooksToExcel = async (borrowed) => {
+    const filePath = "Books.xlsx";
+    let workbook;
+
+    // נסיון לקרוא את הקובץ אם הוא קיים
+    try {
+        workbook = xlsx.readFile(filePath);  // אם הקובץ קיים, קרא אותו
+    } catch (error) {
+        workbook = xlsx.utils.book_new();  // אם לא קיים, צור חדש
     }
-    catch(error){
+
+    const worksheet = xlsx.utils.json_to_sheet(borrowed);  // המרת הספרים לדף אקסל
+    const sheetName = "books";  // שם הגיליון
+
+    // אם כבר יש גיליון בשם 'books', עדכן אותו
+    if (workbook.Sheets[sheetName]) {
+        const existingData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+        const updatedData = existingData.concat(borrowed);  // הוספת נתונים חדשים
+        const updatedWorksheet = xlsx.utils.json_to_sheet(updatedData);
+        workbook.Sheets[sheetName] = updatedWorksheet;  // עדכון הגיליון
+    } else {
+        // אם אין גיליון בשם 'books', הוסף חדש
+        xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
+    }
+
+    // שמירה מחדש של הקובץ עם הנתונים המעודכנים
+    xlsx.writeFile(workbook, filePath);
+}
+
+async function borrow(id, usId) {
+    try {
+        const books = await readBooks()
+        b = books.find(x => x.id == id)
+        if (b != null) {
+            const borrowed = [{ userId: usId, bookId: id, date: new Date().toISOString() }]
+            await writeBooksToExcel(borrowed)
+            return b
+        }
+        else
+            throw new Error("errorBook")
+    }
+    catch (error) {
         console.log(error.message)
         return null
     }
 }
 
-module.exports={Book,borrowBook:borrow,printBook:print,InitBooks,readBooks,cb:printCB}
+module.exports = { Book, borrowBook: borrow, printBook: print, InitBooks, readBooks, cb: printCB }
 
 
 
